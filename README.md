@@ -1,7 +1,6 @@
 # Digital Photoframe
 
-<img width="1002" height="789" alt="image" src="https://github.com/user-attachments/assets/7f096c81-1ceb-42d2-83e9-c24c71470ebb" />
-
+<img width="4000" height="3000" alt="image" src="https://github.com/user-attachments/assets/0ac0abed-0571-4148-a99c-2daa23604304" />
 
 A robust, Kivy-based Android application designed to turn legacy Android tablets into smart digital photoframes. It features Google Drive folder synchronization, local texture caching to prevent RAM overflow on older hardware, and OpenWeather API integration.
 
