@@ -14,8 +14,15 @@ A robust, Kivy-based Android application designed to turn legacy Android tablets
 This project uses `uv` for dependency management.
 
 1.  Clone the repository.
-2.  Place your Google Service Account key in the root directory (must match the `service_acc` filename in `DEFAULT_CFG`).
-3.  Run locally:
+2.  Create a "secrets.json" with your OpenWeatherMap token, Google Drive folder id, and Google service account key .json filename:
+    ```
+    {
+    "open-weather-key" : "",
+    "google-drive-folder-id" : "",
+    "google-drive-service-key-json" : ""
+    }
+    ```
+4.  Run locally:
     ```bash
     uv run python main.py
     ```
