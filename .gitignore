@@ -17,3 +17,4 @@ bin/
 # App-specific and sensitive files
 digital-photoframe-*.json
 digital_photoframe/
+secrets.json

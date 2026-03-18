@@ -63,6 +63,9 @@ else:
 APP_VERSION = "1.0.0"
 GITHUB_REPO = "nolan-cummins/digital-photoframe"
 
+with open("secrets.json", 'r') as f:
+    secrets = json.load(f)
+
 DEFAULT_CFG = {
     'time_mode': 'auto', 'city': 'Champaign', 'region': 'IL', 'tz_offset': '-5', 'format_24h': False,
     'units': 'imperial', 'weather_fmt': '{temp}°F | {wind}mph wind | {clouds}',
@@ -70,8 +73,8 @@ DEFAULT_CFG = {
     'slide_interval': 15, 'sync_interval': 120, 'weather_interval': 600, 'fade_time': 1.5,
     'nav_mode': 'swipe', 'fast_manual': False, 'brightness': 1.0, 'startup_delay': 5,
     'playback_mode': 'sorted',
-    'api_key': '9316b84b7368b4e3cb15cd96a89558a1', 'folder_id': '1D-eE0Ho3AFzKBkDelIkg1l8OoATrmIBk',
-    'service_acc': 'digital-photoframe-490505-12becc3c3561.json',
+    'api_key': secrets["open-weather-key"], 'folder_id': secrets["google-drive-folder-id"],
+    'service_acc': secrets["google-drive-service-key-json"],
     'selected_folder': 'Base', 'show_console': False
 }
 
