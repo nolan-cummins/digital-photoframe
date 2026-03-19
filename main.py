@@ -54,19 +54,36 @@ if platform == 'android':
             Activity.getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON)
         except Exception as e:
             Logger.error(f"WakeLock Error: {e}")
+            
+    @run_on_ui_thread
+    def set_app_orientation(orient_idx):
+        try:
+            Activity = autoclass('org.kivy.android.PythonActivity').mActivity
+            ActivityInfo = autoclass('android.content.pm.ActivityInfo')
+            mapping = [
+                ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE,
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT,
+                ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE,
+                ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
+            ]
+            Activity.setRequestedOrientation(mapping[int(orient_idx) % 4])
+        except Exception as e:
+            Logger.error(f"Orientation Error: {e}")
 else:
     def keep_screen_on(): pass
+    def set_app_orientation(orient_idx): pass
     Config.set('graphics', 'width', '1280')
     Config.set('graphics', 'height', '800')
     PHOTO_DIR = os.path.abspath('./digital_photoframe')
 
-APP_VERSION = "1.0.0"
+APP_VERSION = "1.0.1"
 GITHUB_REPO = "nolan-cummins/digital-photoframe"
 
 with open("secrets.json", 'r') as f:
     secrets = json.load(f)
 
 DEFAULT_CFG = {
+    'orientation': 0,
     'time_mode': 'auto', 'city': 'Champaign', 'region': 'IL', 'tz_offset': '-5', 'format_24h': False,
     'units': 'imperial', 'weather_fmt': '{temp}°F | {wind}mph wind | {clouds}',
     'ui_opacity': 0.8, 'show_ui': True, 'text_color': '#FFFFFF', 'stroke_color': '#000000',
@@ -181,6 +198,7 @@ class PhotoFrameApp(App):
         os.makedirs(PHOTO_DIR, exist_ok=True)
         self.cfg = self._load_cfg()
         self._apply_ui_styles()
+        set_app_orientation(self.cfg.get('orientation', 0))
 
         threading.Thread(target=self._sync_engine_loop, daemon=True).start()
         
@@ -572,6 +590,7 @@ class PhotoFrameApp(App):
         content.bind(minimum_height=content.setter('height'))
 
         schema = [
+            ('orientation', 'Rotate Display 90°', 'button', None),
             ('playback_mode', 'Playback Mode', 'toggle', ('sorted', 'random')),
             ('show_console', 'Show Console Overlay', 'bool', None),
             ('nav_mode', 'Navigation Mode', 'toggle', ('swipe', 'tap')),
@@ -617,6 +636,14 @@ class PhotoFrameApp(App):
                     b.text = b.opts[0] if b.text == b.opts[1] else b.opts[1]
                 btn.bind(on_release=toggle_opt)
                 self.ui_refs[key] = btn
+            elif w_type == 'button':
+                btn = Button(text="Rotate", size_hint_y=None, height=40)
+                def rotate_display(b):
+                    self.cfg['orientation'] = (int(self.cfg.get('orientation', 0)) + 1) % 4
+                    set_app_orientation(self.cfg['orientation'])
+                    self._save_cfg()
+                btn.bind(on_release=rotate_display)
+                self.ui_refs[key] = btn 
             else:
                 inp = TextInput(text=str(self.cfg[key]), multiline=False, size_hint_y=None, height=40)
                 self.ui_refs[key] = inp
@@ -652,6 +679,8 @@ class PhotoFrameApp(App):
         self.cfg['selected_folder'] = self.folder_spinner.text
         
         for key, widget in self.ui_refs.items():
+            if key == 'orientation': 
+                continue 
             val = widget.text
             if isinstance(widget, ToggleButton) and val in ('True', 'False'):
                 self.cfg[key] = (val == 'True')
@@ -663,6 +692,7 @@ class PhotoFrameApp(App):
                     
         self._save_cfg()
         self._apply_ui_styles()
+        set_app_orientation(self.cfg.get('orientation', 0))
         self._trigger_weather()
         
         self.slide_event.cancel()
